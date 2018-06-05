@@ -58,8 +58,8 @@ public class MPTThroughputBenchmark {
             System.out.println("...starting workers");
             this.workers = Executors.newCachedThreadPool();
             int n = 1000000;
-            int updates = 100000;
-            this.bench = new ThroughputBenchmark(n, updates);
+            int updatesToCommit = 100000;
+            this.bench = new ThroughputBenchmark(n, updatesToCommit);
         }
 
         @TearDown(Level.Iteration)
@@ -75,18 +75,33 @@ public class MPTThroughputBenchmark {
         }
 
     }
+    
+    @Benchmark
+    public void testSingleUpdate(BenchmarkState s, Blackhole bh) {
+    	bh.consume(s.bench.performSingleUpdate());
+    }
+    
+    @Benchmark
+    public void testSingleInsert(BenchmarkState s, Blackhole bh) {
+    	bh.consume(s.bench.performSingleInsert());
+    }
+    
+    @Benchmark
+    public void testSingleDelete(BenchmarkState s, Blackhole bh) {
+    	bh.consume(s.bench.performSingleDelete());
+    }
 
     @Benchmark
-    public void testSingleThreaded(BenchmarkState s, Blackhole bh) {
-    	byte[] res = s.bench.performUpdatesSingleThreadedCommits();
+    public void testSingleThreadedCommit(BenchmarkState s, Blackhole bh) {
+    	byte[] res = s.bench.commitSingleThreaded();
     	for(byte b : res) {
     		bh.consume(b);
     	}
     }
     
     @Benchmark
-    public void testParallelized(BenchmarkState s, Blackhole bh) {
-    	byte[] res = s.bench.performUpdatesParallelizedCommits(s.workers);
+    public void testParallelizedCommit(BenchmarkState s, Blackhole bh) {
+    	byte[] res = s.bench.commitParallelized(s.workers);
     	for(byte b : res) {
     		bh.consume(b);
     	}    
