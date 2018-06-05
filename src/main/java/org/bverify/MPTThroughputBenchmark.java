@@ -41,6 +41,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.infra.Blackhole;
 
 import bench.ThroughputBenchmark;
 
@@ -76,18 +77,18 @@ public class MPTThroughputBenchmark {
     }
 
     @Benchmark
-    public void testDoUpdates(BenchmarkState s) {
-    	s.bench.performUpdates();
+    public void testSingleThreaded(BenchmarkState s, Blackhole bh) {
+    	byte[] res = s.bench.performUpdatesSingleThreadedCommits();
+    	for(byte b : res) {
+    		bh.consume(b);
+    	}
     }
     
     @Benchmark
-    public void testCommitUpdatesSingleThreaded(BenchmarkState s) {
-    	s.bench.commitUpdatesSingleThreaded();
+    public void testParallelized(BenchmarkState s, Blackhole bh) {
+    	byte[] res = s.bench.performUpdatesParallelizedCommits(s.workers);
+    	for(byte b : res) {
+    		bh.consume(b);
+    	}    
     }
-    
-    @Benchmark
-    public void testCommitUpdatesParallelized(BenchmarkState s) {
-    	s.bench.commitUpdatesParallelized(s.workers);
-    }
-
 }
