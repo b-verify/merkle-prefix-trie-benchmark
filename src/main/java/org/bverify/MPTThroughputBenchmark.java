@@ -46,13 +46,13 @@ import bench.ThroughputBenchmark;
 
 public class MPTThroughputBenchmark {
 	
-    @State(Scope.Benchmark)
+    @State(Scope.Thread)
     public static class BenchmarkState {
     	
     	public ExecutorService workers;
     	public ThroughputBenchmark bench;
 
-        @Setup(Level.Trial)
+        @Setup(Level.Iteration)
         public void doSetup() {
             System.out.println("...starting workers");
             this.workers = Executors.newCachedThreadPool();
@@ -61,7 +61,7 @@ public class MPTThroughputBenchmark {
             this.bench = new ThroughputBenchmark(n, updates);
         }
 
-        @TearDown(Level.Trial)
+        @TearDown(Level.Iteration)
         public void doTearDown() {
             System.out.println("...shutting down workers");
     		try {
