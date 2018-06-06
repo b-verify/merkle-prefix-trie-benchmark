@@ -31,79 +31,33 @@
 
 package org.bverify;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 
-import bench.ThroughputBenchmark;
+import bench.UpdateBenchmark;
 
-public class MPTThroughputBenchmark {
+public class MPTUpdateBenchmark {
 	
     @State(Scope.Thread)
     public static class BenchmarkState {
     	
-    	public ExecutorService workers;
-    	public ThroughputBenchmark bench;
+    	public UpdateBenchmark bench;
 
         @Setup(Level.Iteration)
         public void doSetup() {
-            System.out.println("...starting workers");
-            this.workers = Executors.newCachedThreadPool();
             int n = 1000000;
-            int updatesToCommit = 100000;
-            this.bench = new ThroughputBenchmark(n, updatesToCommit);
+            int nUpdates = 1;
+            this.bench = new UpdateBenchmark(n, nUpdates);
         }
-
-        @TearDown(Level.Iteration)
-        public void doTearDown() {
-            System.out.println("...shutting down workers");
-    		try {
-    		    if (!this.workers.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-    		        this.workers.shutdownNow();
-    		    } 
-    		} catch (InterruptedException e) {
-    			throw new RuntimeException(e);
-    		}
-        }
-
     }
     
     @Benchmark
-    public void testSingleUpdate(BenchmarkState s, Blackhole bh) {
-    	bh.consume(s.bench.performSingleUpdate());
+    public void testUpdate(BenchmarkState s, Blackhole bh) {
+    	bh.consume(s.bench.performUpdates());
     }
     
-    @Benchmark
-    public void testSingleInsert(BenchmarkState s, Blackhole bh) {
-    	bh.consume(s.bench.performSingleInsert());
-    }
-    
-    @Benchmark
-    public void testSingleDelete(BenchmarkState s, Blackhole bh) {
-    	bh.consume(s.bench.performSingleDelete());
-    }
-
-    @Benchmark
-    public void testSingleThreadedCommit(BenchmarkState s, Blackhole bh) {
-    	byte[] res = s.bench.commitSingleThreaded();
-    	for(byte b : res) {
-    		bh.consume(b);
-    	}
-    }
-    
-    @Benchmark
-    public void testParallelizedCommit(BenchmarkState s, Blackhole bh) {
-    	byte[] res = s.bench.commitParallelized(s.workers);
-    	for(byte b : res) {
-    		bh.consume(b);
-    	}    
-    }
 }
