@@ -25,7 +25,7 @@ public class MPTCommitmentBenchmark {
     }
     
     @Benchmark
-    public void testUpdate(BenchmarkState s, Blackhole bh) {
+    public void testCommitment(BenchmarkState s, Blackhole bh) {
     	bh.consume(s.bench.performCommit());
     }
 }
