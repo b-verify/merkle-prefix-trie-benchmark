@@ -31,8 +31,13 @@
 
 package org.bverify;
 
+import java.util.concurrent.TimeUnit;
+
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -47,7 +52,7 @@ public class MPTUpdateBenchmark {
     	
     	public UpdateBenchmark bench;
 
-        @Setup(Level.Iteration)
+        @Setup(Level.Trial)
         public void doSetup() {
             int n = 1000000;
             int nUpdates = 1;
@@ -55,7 +60,7 @@ public class MPTUpdateBenchmark {
         }
     }
     
-    @Benchmark
+    @Benchmark @BenchmarkMode(Mode.SingleShotTime)  @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testUpdate(BenchmarkState s, Blackhole bh) {
     	bh.consume(s.bench.performUpdates());
     }
