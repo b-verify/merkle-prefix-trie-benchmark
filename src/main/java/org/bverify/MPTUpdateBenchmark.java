@@ -52,7 +52,7 @@ public class MPTUpdateBenchmark {
     	
     	public UpdateBenchmark bench;
 
-        @Setup(Level.Trial)
+        @Setup(Level.Iteration)
         public void doSetup() {
             int n = 1000000;
             int nUpdates = 1;
